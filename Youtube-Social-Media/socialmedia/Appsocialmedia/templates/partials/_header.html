@@ -1,0 +1,87 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'index' %}">Navbar</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Anasayfa</a>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#exampleModal" style="padding-top: 12px;">
+              Post Oluştur
+            </button>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+          </li>
+        </ul>
+        <form class="d-flex position-relative" role="search" action="{% url 'search' %}">
+          <input id="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
+          <div id="search-results" style="position: absolute; top: 35px; background-color: bisque; padding: 10px; display: none; width: 221px;">
+
+          </div>
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+        
+        {% if request.user.is_authenticated %}
+        <div class="dropdown ms-2">
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ request.user.username }}
+          </button>
+          <ul class="dropdown-menu" style="left: -70px; top: 40px;">
+            <li><a class="dropdown-item" href="{% url 'profil' request.user.username %}">Profil</a></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Çıkış Yap</a></li>
+          </ul>
+        </div>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary ms-2">Giriş Yap</a>
+          <a href="{% url 'register' %}" class="btn btn-primary ms-2">Kayıt Ol</a>
+        {% endif %}
+          
+      </div>
+    </div>
+  </nav>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">POST OLUŞTUR</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+      <div class="modal-body">
+        <img id="image" src="" alt="" style="width: 416px; height: auto;" class="mb-3" accept=".jpg, .jpeg, .png">
+        <div class="mb-3 d-flex justify-content-center">
+          <input type="file" class="form-control" id="post-image" name="image" hidden required>
+          <label for="post-image"><i class="fa-regular fa-image fs-1"></i> Fotoğraf Yükleyin</label>
+        </div>
+        <div class="mb-3">
+          <textarea cols="55" rows="10" name="description" placeholder="Açıklama Yazın"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="submit" class="btn btn-primary" name="postbtn" value="btnpost">Paylaş</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>

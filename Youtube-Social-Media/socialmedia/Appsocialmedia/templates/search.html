@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                
+                {% for profil in profils %}
+                <div class="m-2 d-flex">
+                    <img src="{{ profil.image.url }}" alt="" style="width: 50px; border-radius: 50%;">
+                    <a href="{% url 'profil' profil %}" class="ms-2 text-dark"><strong>{{ profil }} </strong></a>
+                  </div>
+                {% endfor %}
+                    
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+    

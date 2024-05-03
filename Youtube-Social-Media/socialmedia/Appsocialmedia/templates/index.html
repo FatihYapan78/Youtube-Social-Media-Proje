@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+        <div class="container">
+            <div class="row pt-5">
+                
+                
+                {% for post in posts %}
+                <div class="col-4"></div>
+                <div class="col-4 mt-5">
+                    <div class="card" style="width: 100%;">
+                        <div class="m-2 d-flex">
+                            <img src="{{ post.profil.image.url }}" alt="" style="width: 50px; border-radius: 50%;">
+                            <a href="{% url 'profil' post.profil %}" class="ms-2 text-dark"><strong>{{ post.profil }} - </strong></a>
+                            <p class="ms-1">{{ post|date_calc:post.date }}</p>
+                        </div>
+                        <img src="{{ post.image.url }}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex">
+                                    
+                                        
+                                    {% if girisli_profil in post.likes.all %}
+                                        <button class="border-0 bg-transparent like-button" data-post-id="{{ post.id }}" data-btn-name="btnlike"><i id="heart-{{ post.id }}" class="fa-solid fa-heart"></i></button>
+                                    {% else %}
+                                        <button class="border-0 bg-transparent like-button" data-post-id="{{ post.id }}" data-btn-name="btnlike"><i id="heart-{{ post.id }}" class="fa-regular fa-heart"></i></button>
+                                    {% endif %}
+                                        
+                                    
+                                    <button type="button" class="border-0 bg-transparent p-0 mb-1" data-bs-toggle="modal" data-bs-target="#PostDetay{{ post.id }}">
+                  
+
+                                        <i class="fa-regular fa-comment"></i>
+                     
+                                         
+                                     </button>
+                                    <p class="ms-2"><i class="fa-solid fa-share-from-square"></i></p>
+                                </div>
+                                {% if girisli_profil in post.post_save.all %}
+                                        <button class="border-0 bg-transparent save-button" data-post-id="{{ post.id }}" data-btn-name="btnsave"><i id="bookmark-{{ post.id }}" class="fa-solid fa-bookmark"></i></button>
+                                    {% else %}
+                                        <button class="border-0 bg-transparent save-button" data-post-id="{{ post.id }}" data-btn-name="btnsave"><i id="bookmark-{{ post.id }}" class="fa-regular fa-bookmark"></i></button>
+                                    {% endif %}
+                            </div>
+                          <!-- Button trigger modal -->
+                          <button id="like-count-{{ post.id }}" type="button" class="border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#LikeModal{{ post.id }}">
+                            {{ post.likes.all|length }} beğenme
+                          </button>
+
+                          <!-- Like Modal Start -->
+                          <div class="modal fade" id="LikeModal{{ post.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h1 class="modal-title fs-5" id="exampleModalLabel">Beğenenler</h1>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                  
+                                  {% for like_user in post.likes.all %}
+                                  <div class="m-2 d-flex">
+                                    <img src="{{ like_user.image.url }}" alt="" style="width: 50px; border-radius: 50%;">
+                                    <a href="{% url 'profil' like_user %}" class="ms-2 text-dark"><strong>{{ like_user }} </strong></a>
+                                  </div>
+                                  {% endfor %}
+                                    
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Like Modal End -->
+                          <p class="card-text">{{ post.description }}</p>
+                          <button id="comment-count-{{ post.id }}" type="button" class="border-0 bg-transparent p-0 mb-1" data-bs-toggle="modal" data-bs-target="#PostDetay{{ post.id }}">
+                  
+
+                           {{ post.comment_count }} yorumun tümünü gör
+        
+                            
+                        </button>
+
+                        
+                        {% for comment in comments %}
+                          
+                          {% if comment.post.id == post.id %}
+                            
+                            {% if comment.profil == girisli_profil %}
+                              <div id="comment-{{ comment.id }}" class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                  <div class="d-flex justify-content-center align-items-center">
+                                      <img src="{{ comment.profil.image.url }}" alt="" style="width: 50px; border-radius: 50%;">
+                                      <a href="{% url 'profil' comment.profil %}" class="ms-2 text-dark"><strong>{{ comment.profil }}</strong></a>
+                                      <p class="mb-0 ms-1">{{ comment.comment }}</p>
+                                      <p class="mb-0 ms-1">{{ comment|date_calc:comment.date }}</p>
+                                    </div>
+                                  <div>
+                                    <button class="border-0 bg-transparent"><i class="fa-regular fa-heart"></i></button>
+                                    <button class="border-0 bg-transparent comment-delete" data-comment-id="{{ comment.id }}" data-btn-name="commentdel" data-post-id="{{ comment.post.id }}"><i class="fa-solid fa-x text-danger"></i></button>
+                                  </div>
+                                </div>
+                              </div>
+                            {% endif %}
+                              
+                          {% endif %}
+                            
+                        {% endfor %}
+                          <div id="comment-list-{{ post.id }}">
+
+                          </div>
+                      
+                          
+                          <div class="d-flex">
+                            <input id="comment-{{ post.id }}" type="text" class="form-control" placeholder="Yorum Ekle">
+                            <button class="border-0 bg-transparent comment-button" data-post-id="{{ post.id }}" data-btn-name="btncomment"><i class="fa-solid fa-share"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                </div>
+                <div class="col-4"></div>
+                      <!-- POST DETAY Modal START -->
+      <div class="modal fade" id="PostDetay{{ post.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="margin-left: 250px;">
+          <div class="modal-content" style="width: 1500px;">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-8">
+                  <img src="{{ post.image.url }}" class="img-fluid">
+                </div>
+                <div class="col-4" style="height: 650px; overflow-y: auto;">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="d-flex">
+                        <div class="m-2 d-flex">
+                            <img src="{{ post.profil.image.url }}" alt="" style="width: 50px; border-radius: 50%;">
+                            <a href="{% url 'profil' post.profil %}" class="ms-2 text-dark"><strong>{{ post.profil }} - </strong></a>
+                            <p class="ms-1">{{ post|date_calc:post.date }}</p>
+                        </div>
+                        <hr>
+                    </div>
+                    </div>
+                    
+                    {% for comment in comments %}
+                      {% if comment.post.id == post.id %}
+                      <div class="col-12 d-flex justify-content-between mb-3">
+                        <div class="d-flex">
+                        <img src="{{ comment.profil.image.url }}" alt="" style="width: 50px; border-radius: 50%;"> 
+                        <div class="ms-2">
+                            <p class="mb-0"><a href="{% url 'profil' comment.profil %}" class="text-dark fw-bold">{{ comment.profil }}</a> {{ comment.comment }}</p>
+                            <p class="mb-0"> {{ comment|date_calc:comment.date }}</p>
+                        </div>
+                        </div>
+                        <div>
+                          <button class="border-0 bg-transparent"><i class="fa-regular fa-heart"></i></button>
+                        <button class="border-0 bg-transparent comment-delete" data-comment-id="{{ comment.id }}" data-btn-name="commentdel" data-post-id="{{ comment.post.id }}"><i class="fa-solid fa-x text-danger"></i></button>
+                        </div>
+                      </div>
+
+                      {% endif %}
+                        
+                    {% endfor %}
+                    <div id="modal-comments-list-{{ post.id }}">
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="row w-100">
+                <div class="col-8"></div>
+                <div class="col-4">
+                  <div class="d-flex justify-content-between">
+                    <div class="d-flex">
+                        <div class="post">
+                            {% if girisli_profil in post.likes.all %}
+                            <button class="border-0 bg-transparent like-button" data-post-id="{{ post.id }}" data-btn-name="btnlike"><i id="modal-heart-{{ post.id }}" class="fa-solid fa-heart"></i></button>
+                        {% else %}
+                            <button class="border-0 bg-transparent like-button" data-post-id="{{ post.id }}" data-btn-name="btnlike"><i id="modal-heart-{{ post.id }}" class="fa-regular fa-heart"></i></button>
+                        {% endif %}
+                        </div>
+                        <label for="modal-comment" class="form-label text-dark" style="cursor: pointer;">
+                          <i class="fa-regular fa-comment mb-3"></i>
+                        </label>
+                        <p class="ms-2"><i class="fa-regular fa-share-from-square"></i></p>
+                    </div>
+                    {% if girisli_profil in post.post_save.all %}
+                    <button class="border-0 bg-transparent save-button" data-post-id="{{ post.id }}" data-btn-name="btnsave"><i id="modal-bookmark-{{ post.id }}" class="fa-solid fa-bookmark"></i></button>
+                {% else %}
+                    <button class="border-0 bg-transparent save-button" data-post-id="{{ post.id }}" data-btn-name="btnsave"><i id="modal-bookmark-{{ post.id }}" class="fa-regular fa-bookmark"></i></button>
+                {% endif %}
+                  </div>
+                  <p id="modal-like-count-{{ post.id }}">{{ post.likes.all|length }} beğenme</p>
+                  <div class="d-flex">
+                    <input id="modal-comment-{{ post.id }}" type="text" class="form-control" placeholder="Yorum Ekle">
+                    <button class="border-0 bg-transparent modal-comment-button" data-post-id="{{ post.id }}" data-btn-name="btncomment"><i class="fa-solid fa-share"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- POST DETAY Modal END -->
+                {% endfor %}
+                    
+                
+            </div>
+        </div>
+{% endblock content %}
+
+
+
+{% block extrajs %}
+    <script>
+        $(".like-button").click(function(){
+            var post_id = $(this).data("post-id")
+            var button = $(this).data("btn-name")
+
+            // console.log(post_id)
+            // console.log(button)
+
+            $.ajax({
+                url:'/',
+                method:"POST",
+                data: {"post_id":post_id,
+                        "button":button
+                },
+                success:function(data){
+                    $("#like-count-" + post_id).html(data.like_count + " " + "beğenme");
+                    $("#modal-like-count-" + post_id).html(data.like_count + " " + "beğenme");
+                    if(data.liked_request_user){
+                        $("#heart-" + post_id).removeClass("fa-regular");
+                        $("#heart-" + post_id).addClass("fa-solid");
+                        $("#modal-heart-" + post_id).removeClass("fa-regular");
+                        $("#modal-heart-" + post_id).addClass("fa-solid");
+                    }
+                    else{
+                        $("#heart-" + post_id).removeClass("fa-solid");
+                        $("#heart-" + post_id).addClass("fa-regular");
+                        $("#modal-heart-" + post_id).removeClass("fa-solid");
+                        $("#modal-heart-" + post_id).addClass("fa-regular");
+                    }
+                }
+            })
+        })
+        $(".save-button").click(function(){
+            var post_id = $(this).data("post-id")
+            var button = $(this).data("btn-name")
+
+            console.log(post_id)
+            console.log(button)
+
+            $.ajax({
+                url:'/',
+                method:"POST",
+                data: {"post_id":post_id,
+                        "button":button
+                },
+                success:function(data){
+
+                    if(data.saved_request_user){
+                        $("#bookmark-" + post_id).removeClass("fa-regular");
+                        $("#bookmark-" + post_id).addClass("fa-solid");
+                        $("#modal-bookmark-" + post_id).removeClass("fa-regular");
+                        $("#modal-bookmark-" + post_id).addClass("fa-solid");
+                    }
+                    else{
+                        $("#bookmark-" + post_id).removeClass("fa-solid");
+                        $("#bookmark-" + post_id).addClass("fa-regular");
+                        $("#modal-bookmark-" + post_id).removeClass("fa-solid");
+                        $("#modal-bookmark-" + post_id).addClass("fa-regular");
+                    }
+                }
+            })
+        })
+
+        $(".comment-button").click(function(){
+          var post_id = $(this).data("post-id");
+          var comment = $("#comment-" + post_id).val();
+          var button = $(this).data("btn-name");
+
+          $.ajax({
+            url:"/",
+            method:"POST",
+            data: {
+              'post_id':post_id,
+              "comment":comment,
+              "button":button
+            },
+            success: function(data){
+              $("#comment-count-" + post_id).html(data.comment_count + " " + "yorumun tümünü gör");
+
+              $("#comment-list-" + post_id).append(
+                '<div id="comment-'+ data.comment_id +'" class="mb-3">'+
+                  '<div class="d-flex justify-content-between">'+
+                    '<div class="d-flex justify-content-center align-items-center">'+
+                      '<img src="' + data.profil_foto + '" alt="" style="width: 50px; border-radius: 50%;">'+
+                      '<a href="/profil/' + data.profil + '" class="ms-2 text-dark"><strong>' + data.profil + '</strong></a>' +
+                      '<p class="mb-0 ms-1">'+ data.comment +'</p>'+
+                      '<p class="mb-0 ms-1">Şimdi</p>'+
+                    '</div>'+
+                    '<div>' +
+                      '<button class="border-0 bg-transparent"><i class="fa-regular fa-heart"></i></button>'+
+                      '<button class="border-0 bg-transparent comment-delete" data-comment-id="'+ data.comment_id +'" data-btn-name="commentdel" data-post-id="'+ post_id +'"><i class="fa-solid fa-x text-danger"></i></button>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'
+              )
+              $("#modal-comments-list-" + post_id).append(
+                '<div id="modal-comment-'+ data.comment_id +'" class="mb-3">'+
+                  '<div class="d-flex justify-content-between">'+
+                    '<div class="d-flex justify-content-center align-items-center">'+
+                      '<img src="' + data.profil_foto + '" alt="" style="width: 50px; border-radius: 50%;">'+
+                      '<a href="/profil/' + data.profil + '" class="ms-2 text-dark"><strong>' + data.profil + '</strong></a>' +
+                      '<p class="mb-0 ms-1">'+ data.comment +'</p>'+
+                      '<p class="mb-0 ms-1">Şimdi</p>'+
+                    '</div>'+
+                    '<div>' +
+                      '<button class="border-0 bg-transparent"><i class="fa-regular fa-heart"></i></button>'+
+                      '<button class="border-0 bg-transparent comment-delete" data-comment-id="'+ data.comment_id +'" data-btn-name="commentdel" data-post-id="'+ post_id +'"><i class="fa-solid fa-x text-danger"></i></button>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'
+              )
+
+              
+            }
+          })
+        })
+
+        $(".modal-comment-button").click(function(){
+          var post_id = $(this).data("post-id");
+          var comment = $("#modal-comment-" + post_id).val();
+          var button = $(this).data("btn-name");
+
+          $.ajax({
+            url:"/",
+            method:"POST",
+            data: {
+              'post_id':post_id,
+              "comment":comment,
+              "button":button
+            },
+            success: function(data){
+              $("#comment-count-" + post_id).html(data.comment_count + " " + "yorumun tümünü gör");
+
+              $("#comment-list-" + post_id).append(
+                '<div id="comment-'+ data.comment_id +'" class="mb-3">'+
+                  '<div class="d-flex justify-content-between">'+
+                    '<div class="d-flex justify-content-center align-items-center">'+
+                      '<img src="' + data.profil_foto + '" alt="" style="width: 50px; border-radius: 50%;">'+
+                      '<a href="/profil/' + data.profil + '" class="ms-2 text-dark"><strong>' + data.profil + '</strong></a>' +
+                      '<p class="mb-0 ms-1">'+ data.comment +'</p>'+
+                      '<p class="mb-0 ms-1">Şimdi</p>'+
+                    '</div>'+
+                    '<div>' +
+                      '<button class="border-0 bg-transparent"><i class="fa-regular fa-heart"></i></button>'+
+                      '<button class="border-0 bg-transparent comment-delete" data-comment-id="'+ data.comment_id +'" data-btn-name="commentdel" data-post-id="'+ post_id +'"><i class="fa-solid fa-x text-danger"></i></button>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'
+              )
+              $("#modal-comments-list-" + post_id).append(
+                '<div id="modal-comment-'+ data.comment_id +'" class="mb-3">'+
+                  '<div class="d-flex justify-content-between">'+
+                    '<div class="d-flex justify-content-center align-items-center">'+
+                      '<img src="' + data.profil_foto + '" alt="" style="width: 50px; border-radius: 50%;">'+
+                      '<a href="/profil/' + data.profil + '" class="ms-2 text-dark"><strong>' + data.profil + '</strong></a>' +
+                      '<p class="mb-0 ms-1">'+ data.comment +'</p>'+
+                      '<p class="mb-0 ms-1">Şimdi</p>'+
+                    '</div>'+
+                    '<div>' +
+                      '<button class="border-0 bg-transparent"><i class="fa-regular fa-heart"></i></button>'+
+                      '<button class="border-0 bg-transparent comment-delete" data-comment-id="'+ data.comment_id +'" data-btn-name="commentdel" data-post-id="'+ post_id +'"><i class="fa-solid fa-x text-danger"></i></button>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'
+              )
+
+              
+            }
+          })
+        })
+
+        $(document).on("click", ".comment-delete", function(){
+          var post_id = $(this).data("post-id")
+          var comment_id = $(this).data("comment-id")
+          var button = $(this).data("btn-name")
+
+          $.ajax({
+              url:"/",
+              method:"POST",
+              data:{
+                "comment_id":comment_id,
+                "post_id":post_id,
+                "button":button
+  
+              },
+              success: function(data){
+                $("#comment-"+ comment_id).remove();
+                $("#modal-comment-"+ comment_id).remove();
+                $("#comment-count-" + post_id).html(data.comment_count + " " + "yorumun tümünü gör");
+
+              }
+            })
+          
+          
+            
+
+        })
+    </script>
+    
+{% endblock extrajs %}
+    
